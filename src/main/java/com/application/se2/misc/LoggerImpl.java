@@ -2,8 +2,12 @@ package com.application.se2.misc;
 
 import static com.application.se2.AppConfigurator.LoggerConfig;
 import static com.application.se2.AppConfigurator.LoggerTopics;
+import static java.util.logging.Level.*;
 
 import com.application.se2.model.Entity;
+import org.apache.log4j.ConsoleAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.SimpleLayout;
 
 
 /**
@@ -14,14 +18,21 @@ import com.application.se2.model.Entity;
  */
 class LoggerImpl implements Logger {
 	private static LoggerImpl instance = null;
-
-
+	//private final java.util.logging.Logger realLogger;
+	private final org.apache.log4j.Logger realLogger;
 	/**
 	 * Private constructor to prevent instance creation outside getInstance().
 	 * @param clazz class that identifies the logger instance.
 	 */
 	private LoggerImpl( final Class<?> clazz ) {
-		
+		//realLogger = java.util.logging.Logger.getLogger( clazz.getName() );
+		realLogger = org.apache.log4j.Logger.getLogger( clazz );
+		SimpleLayout layout = new SimpleLayout();
+		ConsoleAppender consoleAppender = new ConsoleAppender(layout);
+		this.realLogger.addAppender(consoleAppender);
+		//ALL | DEBUG | INFO | WARN | ERROR | FATAL | OFF:
+		this.realLogger.setLevel(Level.ALL);
+
 	}
 
 	/**
@@ -30,10 +41,7 @@ class LoggerImpl implements Logger {
 	 * @return logger instance for the class.
 	 */
 	public static LoggerImpl getInstance( final Class<?> clazz ) {
-		if( instance == null ) {
-			instance = new LoggerImpl( clazz );
-		}
-		return instance;
+		return new LoggerImpl( clazz );
 	}
 
 
@@ -54,7 +62,7 @@ class LoggerImpl implements Logger {
 			case Always:
 			case Info:
 			case Warn:
-				System.out.println( msg );
+				realLogger.info( msg );
 				break;
 
 			case Error:
@@ -76,18 +84,18 @@ class LoggerImpl implements Logger {
 				for( Object arg : args ) {
 					sb.append( arg.toString() );
 				}
-				System.out.println( sb.toString() );
+				realLogger.info( sb.toString() );
 				break;
 
 			case Startup:
 				indicator = " + startup";
 			case Shutdown:
-				System.out.println( indicator + ": " + msg );
+				realLogger.info( indicator + ": " + msg );
 				break;
 
 			case PropertiesAltered:
 			case FieldAccessAltered:
-				System.out.println( msg );
+				realLogger.info( msg );
 				break;
 
 			case RepositoryLoaded:
@@ -96,11 +104,11 @@ class LoggerImpl implements Logger {
 					arg = arg != null && arg instanceof Traceable? ((Traceable)arg).getRootObject() : arg;
 					id = arg instanceof Entity? ((Entity)arg).getId() : String.valueOf( arg.hashCode() );
 				}
-				System.out.println( "Repository: --> " + id );
+				realLogger.info( "Repository: --> " + id );
 				break;
 
 			case CSSLoaded:
-				System.out.println( msg );
+				realLogger.info( msg );
 				break;
 
 			}
