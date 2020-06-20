@@ -27,11 +27,11 @@ class LoggerImpl implements Logger {
 	private LoggerImpl( final Class<?> clazz ) {
 		//realLogger = java.util.logging.Logger.getLogger( clazz.getName() );
 		realLogger = org.apache.log4j.Logger.getLogger( clazz );
-		SimpleLayout layout = new SimpleLayout();
+		/*SimpleLayout layout = new SimpleLayout();
 		ConsoleAppender consoleAppender = new ConsoleAppender(layout);
 		this.realLogger.addAppender(consoleAppender);
 		//ALL | DEBUG | INFO | WARN | ERROR | FATAL | OFF:
-		this.realLogger.setLevel(Level.ALL);
+		this.realLogger.setLevel(Level.ALL);*/
 
 	}
 
